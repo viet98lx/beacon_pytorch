@@ -78,7 +78,7 @@ print(nb_test)
 
 print("@Build knowledge")
 MAX_SEQ_LENGTH, item_dict, reversed_item_dict, item_probs = utils.build_knowledge(train_instances, validate_instances, test_instances)
-
+print("first item in dict ", reversed_item_dict[0])
 print("#Statistic")
 NB_ITEMS = len(item_dict)
 print(" + Maximum sequence length: ", MAX_SEQ_LENGTH)
