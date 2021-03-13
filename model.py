@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn import TransformerEncoder, TransformerEncoderLayer
+import numpy as np
 
 ###################  Multi Intent Next Basket Rec Model ####################
 
@@ -29,8 +29,14 @@ class RecSysModel(torch.nn.Module):
         self.d_type = d_type
 
         # initialized adjacency matrix
-        self.C = adj_matrix
-        self.C = torch.from_numpy(self.C).to(d_type)
+        self.C = torch.from_numpy(adj_matrix.todense()).to(self.device)
+        # values = adj_matrix.data
+        # indices = np.vstack((adj_matrix.row, adj_matrix.col))
+        #
+        # i = torch.LongTensor(indices)
+        # v = torch.FloatTensor(values)
+        # shape = adj_matrix.shape
+        # self.C = torch.sparse.FloatTensor(i, v, torch.Size(shape)).to(self.device)
 
         # threshold ignore weak correlation
         threshold = adj_matrix.mean()
