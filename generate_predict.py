@@ -44,7 +44,7 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
 
 parser = argparse.ArgumentParser(description='Generate predict')
 parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', required=True)
-# parser.add_argument('--model_name', type=str, help='name of model', required=True)
+parser.add_argument('--model_name', type=str, help='name of model', required=True)
 # parser.add_argument('--epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
 parser.add_argument('--nb_hop', type=int, help='level of correlation matrix', default=1)
@@ -54,7 +54,7 @@ parser.add_argument('--nb_predict', type=int, help='number items predicted', def
 
 args = parser.parse_args()
 
-# prefix_model_ckpt = args.model_name
+prefix_model_ckpt = args.model_name
 ckpt_dir = args.ckpt_dir
 data_dir = args.data_dir
 real_adj_matrix = sp.load_npz(data_dir + 'adj_matrix/r_matrix_'+ str(args.nb_hop) + 'w.npz')
@@ -89,7 +89,7 @@ batch_size = args.batch_size
 # valid_loader = data_utils.generate_data_loader(validate_instances, load_param['batch_size'], item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=False)
 test_loader = data_utils.generate_data_loader(test_instances, batch_size, item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=True)
 
-load_model = torch.load(ckpt_dir)
+load_model = torch.load(ckpt_dir+'/'+prefix_model_ckpt+'.pt')
 nb_predict = args.nb_predict
 result_file = ckpt_dir+'predict_top_' + str(nb_predict) + '.txt'
 generate_predict(load_model, test_loader, result_file, reversed_item_dict, nb_predict, batch_size)
