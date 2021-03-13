@@ -67,8 +67,8 @@ def load_ckpt(checkpoint_fpath, model, optimizer):
     return model, optimizer, checkpoint['epoch'], valid_loss_min, best_recall, train_losses, train_recalls, val_losses, val_recalls
 
 
-def save_config_param(model_dir, prefix_name, config_param):
-    config_file = model_dir + prefix_name + '/' + prefix_name + '_config.json'
+def save_config_param(model_dir, model_name, config_param):
+    config_file = model_dir + model_name + '_config.json'
     with open(config_file, 'w') as fp:
         json.dump(config_param, fp)
 
