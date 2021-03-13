@@ -91,5 +91,5 @@ test_loader = data_utils.generate_data_loader(test_instances, batch_size, item_d
 
 load_model = torch.load(ckpt_dir+'/'+prefix_model_ckpt+'.pt')
 nb_predict = args.nb_predict
-result_file = ckpt_dir+'/'+prefix_model_ckpt+'predict_top_' + str(nb_predict) + '.txt'
+result_file = ckpt_dir+'/'+prefix_model_ckpt+'_predict_top_' + str(nb_predict) + '.txt'
 generate_predict(load_model, test_loader, result_file, reversed_item_dict, nb_predict, batch_size)
