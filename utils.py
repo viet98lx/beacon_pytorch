@@ -197,7 +197,7 @@ def compute_recall_at_top_k(model, logits, top_k, target_basket, batch_size, dev
     # nb_correct = (correct_predict == 1.0).sum(dim=-1)
     nb_correct = np.count_nonzero(correct_predict, axis=1)
     # actual_basket_size = (target_basket == 1.0).sum(dim=-1)
-    actual_basket_size = np.count_nonzero(target_basket, axis=1)
+    actual_basket_size = np.count_nonzero(target_basket_np, axis=1)
 
     return np.mean(nb_correct / actual_basket_size)
 
