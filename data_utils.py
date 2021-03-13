@@ -47,12 +47,12 @@ def seq_generator(raw_lines, item_dict):
         O.append(tbasket)
 
         # Add the target basket
-        target_item_list = re.split('[\\s]+', tbasket)
+        target_item_list = re.split('[\\s]+', tbasket.strip())
         Y.append(create_binary_vector(target_item_list, item_dict))
 
         s = []
         for basket in bseq:
-            item_list = re.split('[\\s]+', basket)
+            item_list = re.split('[\\s]+', basket.strip())
             id_list = [item_dict[item] for item in item_list]
             s.append(id_list)
         S.append(s)
