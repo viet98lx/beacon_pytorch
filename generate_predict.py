@@ -33,14 +33,14 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
 
             for row in range(0, indices.size()[0]):
                 f.write('\n')
-                f.write('ground_truth: ')
+                f.write('ground_truth | ')
                 ground_truth = y_[row].nonzero().squeeze(dim=-1)
                 for idx_key in range(0, ground_truth.size()[0]):
                     f.write(str(reversed_item_dict[ground_truth[idx_key].item()]) + " ")
                 f.write('\n')
-                f.write('predicted_items: ')
+                f.write('predicted_items ')
                 for col in range(0, indices.size()[1]):
-                    f.write('| ' + str(reversed_item_dict[indices[row][col].item()]) + ': %.8f' % (values[row][col].item()) + ' ')
+                    f.write('| ' + str(reversed_item_dict[indices[row][col].item()]) + ':%.8f' % (values[row][col].item()) + ' ')
 
 parser = argparse.ArgumentParser(description='Generate predict')
 parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', required=True)
@@ -91,5 +91,5 @@ test_loader = data_utils.generate_data_loader(test_instances, batch_size, item_d
 
 load_model = torch.load(ckpt_dir+'/'+prefix_model_ckpt+'.pt')
 nb_predict = args.nb_predict
-result_file = ckpt_dir+'predict_top_' + str(nb_predict) + '.txt'
+result_file = ckpt_dir+'/'+prefix_model_ckpt+'predict_top_' + str(nb_predict) + '.txt'
 generate_predict(load_model, test_loader, result_file, reversed_item_dict, nb_predict, batch_size)
