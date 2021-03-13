@@ -30,7 +30,7 @@ class RecSysModel(torch.nn.Module):
 
         # initialized adjacency matrix
         self.C = adj_matrix
-        self.C = torch.from_numpy(self.C).to(self.device, d_type)
+        self.C = torch.from_numpy(self.C).to(d_type)
 
         # threshold ignore weak correlation
         threshold = adj_matrix.mean()
@@ -65,7 +65,8 @@ class RecSysModel(torch.nn.Module):
         batch_size = x.size()[0]
         item_bias_diag = F.relu(torch.diag(self.I_B))
         reshape_x = x.reshape(-1, self.nb_items)
-        encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(torch.mm(reshape_x, self.C) - torch.abs(self.threshold))
+        x_mm_C = torch.mm(reshape_x.cpu(), self.C)
+        encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(x_mm_C.to(self.device) - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
         basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
 
