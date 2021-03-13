@@ -32,7 +32,6 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
             values = topk_result.values
 
             for row in range(0, indices.size()[0]):
-                f.write('\n')
                 f.write('ground_truth | ')
                 ground_truth = y_[row].nonzero().squeeze(dim=-1)
                 for idx_key in range(0, ground_truth.size()[0]):
@@ -41,6 +40,7 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
                 f.write('predicted_items ')
                 for col in range(0, indices.size()[1]):
                     f.write('| ' + str(reversed_item_dict[indices[row][col].item()]) + ':%.8f' % (values[row][col].item()) + ' ')
+                f.write('\n')
 
 parser = argparse.ArgumentParser(description='Generate predict')
 parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', required=True)
