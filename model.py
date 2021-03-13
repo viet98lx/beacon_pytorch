@@ -63,10 +63,10 @@ class RecSysModel(torch.nn.Module):
 
     def forward(self, x, seq_len, hidden):
         batch_size = x.size()[0]
-        item_bias_diag = F.relu(torch.diag(self.I_B))
+        item_bias_diag = F.relu(self.I_B)
         reshape_x = x.reshape(-1, self.nb_items)
         x_mm_C = torch.mm(reshape_x.cpu(), self.C)
-        encode_x_graph = torch.mm(reshape_x, item_bias_diag) + F.relu(x_mm_C.to(self.device) - torch.abs(self.threshold))
+        encode_x_graph = torch.matmul(reshape_x, item_bias_diag) + F.relu(x_mm_C.to(self.device) - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
         basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
 
@@ -80,7 +80,9 @@ class RecSysModel(torch.nn.Module):
         # predict next items score
         next_item_probs = torch.sigmoid(hidden_to_score)
 
+        next_item_probs_mm_C = torch.mm(next_item_probs.cpu(), self.C)
+
         # print(next_item_probs)
         predict = (1 - self.alpha) * next_item_probs + self.alpha * (
-                torch.mm(next_item_probs, item_bias_diag) + torch.mm(next_item_probs, self.C))
+                torch.matmul(next_item_probs, item_bias_diag) + next_item_probs_mm_C.to(self.device))
         return predict
