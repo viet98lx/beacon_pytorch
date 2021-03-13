@@ -86,9 +86,10 @@ class RecSysModel(torch.nn.Module):
         # predict next items score
         next_item_probs = torch.sigmoid(hidden_to_score)
 
-        next_item_probs_mm_C = torch.mm(next_item_probs.cpu(), self.C)
+        # next_item_probs_mm_C = torch.mm(next_item_probs.cpu(), self.C)
+        # + next_item_probs_mm_C.to(self.device)
 
         # print(next_item_probs)
         predict = (1 - self.alpha) * next_item_probs + self.alpha * (
-                next_item_probs*item_bias_diag + next_item_probs_mm_C.to(self.device))
+                next_item_probs*item_bias_diag)
         return predict
