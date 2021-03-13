@@ -156,6 +156,8 @@ for ep in range(epoch):
                                                                                          ep, top_k, train_display_step)
     # train_losses.append(avg_train_loss)
     # train_recalls.append(avg_train_recall)
+    print("Train loss: ", avg_train_loss)
+    print("Train recall: ", avg_train_recall)
     writer.add_scalar("Loss/train", avg_train_loss, ep)
     writer.add_scalar("Recall/train", avg_train_recall, ep)
 
@@ -163,6 +165,8 @@ for ep in range(epoch):
                                                               ep, top_k, val_display_step)
     # val_losses.append(avg_val_loss)
     # val_recalls.append(avg_val_recall)
+    print("Val loss: ", avg_val_loss)
+    print("Val recall: ", avg_val_recall)
     writer.add_scalar("Loss/val", avg_val_loss, ep)
     writer.add_scalar("Recall/val", avg_val_recall, ep)
 
@@ -174,31 +178,13 @@ for ep in range(epoch):
     writer.add_scalar("Loss/test", avg_test_loss, ep)
     writer.add_scalar("Recall/test", avg_test_recall, ep)
 
-    # scheduler.step()
-
-    # checkpoint = {
-    #     'epoch': ep,
-    #     'valid_loss_min': avg_val_loss,
-    #     'best_recall': avg_val_recall,
-    #     'state_dict': rec_sys_model.state_dict(),
-    #     'optimizer': optimizer.state_dict(),
-    #     # 'schedule': scheduler.state_dict(),
-    #     'val_loss_list': val_losses,
-    #     'val_recall_list': val_recalls,
-    #     'train_loss_list': train_losses,
-    #     'train_recall_list': train_recalls
-    # }
-    # save checkpoint
-    # check_point.save_ckpt(checkpoint, False, model_name, checkpoint_dir, best_model_dir, ep)
-    # check_point.save_config_param(checkpoint_dir, model_name, config_param)
-
     if ((loss_min - avg_test_loss) / loss_min > epsilon and avg_test_recall > recall_max):
         print('Test loss decrease from ({:.6f} --> {:.6f}) '.format(loss_min, avg_test_loss))
         print('recall increase from {:.6f} --> {:.6f}'.format(recall_max, avg_test_recall))
         print('Can save model')
         # check_point.save_ckpt(checkpoint, True, model_name, checkpoint_dir, best_model_dir, ep)
         check_point.save_config_param(best_model_dir, model_name, config_param)
-        torch.save(rec_sys_model, best_model_dir+'best_model.pt')
+        torch.save(rec_sys_model, best_model_dir+model_name+'.pt')
         print('Done')
         loss_min = avg_test_loss
         recall_max = avg_test_recall
