@@ -29,7 +29,7 @@ class RecSysModel(torch.nn.Module):
         self.d_type = d_type
 
         # initialized adjacency matrix
-        self.C = torch.from_numpy(adj_matrix.todense()).to(self.device)
+        self.C = torch.from_numpy(adj_matrix.to_dense())
         # values = adj_matrix.data
         # indices = np.vstack((adj_matrix.row, adj_matrix.col))
         #
