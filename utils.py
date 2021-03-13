@@ -25,7 +25,7 @@ def build_knowledge(training_instances, validate_instances, test_instances):
             basket_seq = [elements[-1]]
 
         for basket in basket_seq:
-            item_list = re.split('[\\s]+', basket)
+            item_list = re.split('[\\s]+', basket.strip())
             for item_obs in item_list:
                 if item_obs not in item_freq_dict:
                     item_freq_dict[item_obs] = 1
@@ -45,7 +45,7 @@ def build_knowledge(training_instances, validate_instances, test_instances):
             basket_seq = [elements[-1]]
 
         for basket in basket_seq:
-            item_list = re.split('[\\s]+', basket)
+            item_list = re.split('[\\s]+', basket.strip())
             for item_obs in item_list:
                 if item_obs not in item_freq_dict:
                     item_freq_dict[item_obs] = 1
@@ -64,7 +64,7 @@ def build_knowledge(training_instances, validate_instances, test_instances):
             basket_seq = [elements[-1]]
 
         for basket in basket_seq:
-            item_list = re.split('[\\s]+', basket)
+            item_list = re.split('[\\s]+', basket.strip())
             for item_obs in item_list:
                 if item_obs not in item_freq_dict:
                     item_freq_dict[item_obs] = 1
@@ -97,7 +97,7 @@ def build_sparse_adjacency_matrix_v2(training_instances, validate_instances, ite
             basket_seq = [elements[-1]]
 
         for basket in basket_seq:
-            item_list = re.split('[\\s]+', basket)
+            item_list = re.split('[\\s]+', basket.strip())
             id_list = [item_dict[item] for item in item_list]
 
             for t in list(itertools.product(id_list, id_list)):
@@ -113,7 +113,7 @@ def build_sparse_adjacency_matrix_v2(training_instances, validate_instances, ite
             basket_seq = [elements[-1]]
 
         for basket in basket_seq:
-            item_list = re.split('[\\s]+', basket)
+            item_list = re.split('[\\s]+', basket.strip())
             id_list = [item_dict[item] for item in item_list]
 
             for t in list(itertools.product(id_list, id_list)):
