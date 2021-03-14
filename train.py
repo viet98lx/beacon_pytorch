@@ -177,7 +177,7 @@ for ep in range(epoch):
     writer.add_scalar("Loss/test", avg_test_loss, ep)
     writer.add_scalar("Recall/test", avg_test_recall, ep)
 
-    if ((loss_min - avg_test_loss) / loss_min > epsilon and avg_test_recall > recall_max):
+    if (avg_test_recall > recall_max):
         print('Test loss decrease from ({:.6f} --> {:.6f}) '.format(loss_min, avg_test_loss))
         print('recall increase from {:.6f} --> {:.6f}'.format(recall_max, avg_test_recall))
         print('Can save model')

@@ -3,10 +3,10 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description='Calculate recall')
 parser.add_argument('--result_file', type=str, help='file contains predicted result', required=True)
-parser.add_argument('--top_k', type=int, help='top k highest rank items', required=True)
+# parser.add_argument('--top_k', type=int, help='top k highest rank items', required=True)
 args = parser.parse_args()
 result_file = args.result_file
-top_k = args.top_k
+# top_k = args.top_k
 list_seq = []
 list_seq_topk_predicted = []
 with open(result_file, 'r') as f:
@@ -27,14 +27,19 @@ with open(result_file, 'r') as f:
                 list_top_k_item.append(item_key)
             list_seq_topk_predicted.append(list_top_k_item.copy())
             list_top_k_item.clear()
-list_recall = []
-for i, ground_truth in enumerate(list_seq):
-  correct = 0
-  # print(i)
-  for item in list_seq_topk_predicted[i]:
-    if (item in ground_truth):
-        correct += 1
-  recall_score = float(correct) / float(len(ground_truth))
-  list_recall.append(recall_score)
-# print(list_recall)
-print(np.array(list_recall).mean())
+for topk in [5,10,15,20]:
+    list_recall = []
+    for gt, predict in zip(list_seq, list_seq_topk_predicted):
+            num_correct = len(set(gt).intersection(predict[:topk]))
+            list_recall.append(num_correct / len(gt))
+    recall = np.array(list_recall).mean()
+    print("Recall top {%2d}: {%.4f}" % (topk, recall))
+
+    hit_count = 0
+    for gt, predict in zip(list_seq, list_seq_topk_predicted):
+        num_correct = len(set(gt).intersection(predict[:topk]))
+        if num_correct > 0:
+            hit_count += 1
+    hr =  hit_count / len(list_seq_topk_predicted)
+    print("Hit ratio top {%2d}: {%.4f}" % (topk, hr))
+
