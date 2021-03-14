@@ -20,11 +20,10 @@ def generate_predict(model, data_loader, result_file, reversed_item_dict, number
         # f.write('Predict result: ')
         for i, data_pack in enumerate(data_loader,0):
             data_x, data_seq_len, data_y = data_pack
-            x_ = data_x.to_dense().to(dtype = model.d_type, device = device)
+            x_ = data_x.to(dtype = model.d_type, device = device)
             real_batch_size = x_.size()[0]
-            hidden = model.init_hidden(real_batch_size)
             y_ = data_y.to(dtype = model.d_type, device = device)
-            predict_ = model(x_, data_seq_len, hidden)
+            predict_ = model(x_)
             sigmoid_pred = torch.sigmoid(predict_)
             topk_result = sigmoid_pred.topk(dim=-1, k= number_predict, sorted=True)
             indices = topk_result.indices
