@@ -24,9 +24,9 @@ class Weighted_BCE_Loss(torch.nn.Module):
         ratio = (nb_neg / nb_pos).unsqueeze(dim=-1)
         # print(ratio)
 
-        neg_loss = -neg_y * torch.log(1.0 - torch.sigmoid(predict - pos_min))
+        neg_loss = -neg_y * torch.log(1.0 - torch.sigmoid(predict - pos_min) + 1e-8)
         # neg_loss = -neg_y * torch.log(1.0 - sigmoid_predict)
-        pos_loss = -y * torch.log(sigmoid_predict)
+        pos_loss = -y * torch.log(sigmoid_predict + 1e-8)
 
         loss_batch = pos_loss * ratio + neg_loss + 1e-8
 
