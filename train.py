@@ -142,7 +142,11 @@ train_recalls = []
 val_recalls = []
 test_losses = []
 test_recalls = []
-writer = SummaryWriter()
+
+log_dir = 'seed_{}_{}'.format(seed, args.model_name)
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+writer = SummaryWriter(log_dir='runs/'+log_dir)
 print('-------------------Start Training Model---------------------')
 
 ############################ Train Model #############################
@@ -151,42 +155,40 @@ print('-------------------Start Training Model---------------------')
 
 for ep in range(epoch):
 
-    rec_sys_model, optimizer, avg_train_loss, avg_train_recall = model_utils.train_model(rec_sys_model, loss_func, optimizer, train_loader,
+    rec_sys_model, optimizer, avg_train_loss, avg_train_recall, avg_train_prec, avg_train_f1 = model_utils.train_model(rec_sys_model, loss_func, optimizer, train_loader,
                                                                                          ep, top_k, train_display_step)
-    # train_losses.append(avg_train_loss)
-    # train_recalls.append(avg_train_recall)
-    print("Train loss: ", avg_train_loss)
-    print("Train recall: ", avg_train_recall)
+
     writer.add_scalar("Loss/train", avg_train_loss, ep)
     writer.add_scalar("Recall/train", avg_train_recall, ep)
+    writer.add_scalar("Precision/train", avg_train_prec, ep)
+    writer.add_scalar("F1/train", avg_train_f1, ep)
 
-    avg_val_loss, avg_val_recall = model_utils.validate_model(rec_sys_model, loss_func, valid_loader,
+    avg_val_loss, avg_val_recall, avg_val_prec, avg_val_f1 = model_utils.validate_model(rec_sys_model, loss_func, valid_loader,
                                                               ep, top_k, val_display_step)
-    # val_losses.append(avg_val_loss)
-    # val_recalls.append(avg_val_recall)
-    print("Val loss: ", avg_val_loss)
-    print("Val recall: ", avg_val_recall)
+
     writer.add_scalar("Loss/val", avg_val_loss, ep)
     writer.add_scalar("Recall/val", avg_val_recall, ep)
+    writer.add_scalar("Precision/val", avg_val_prec, ep)
+    writer.add_scalar("F1/val", avg_val_f1, ep)
 
-    avg_test_loss, avg_test_recall = model_utils.test_model(rec_sys_model, loss_func, test_loader,
+    avg_test_loss, avg_test_recall, avg_test_prec, avg_test_f1 = model_utils.test_model(rec_sys_model, loss_func, test_loader,
                                                             ep, top_k, test_display_step)
-    # test_losses.append(avg_test_loss)
-    # test_recalls.append(avg_test_recall)
 
     writer.add_scalar("Loss/test", avg_test_loss, ep)
     writer.add_scalar("Recall/test", avg_test_recall, ep)
+    writer.add_scalar("Precision/test", avg_test_prec, ep)
+    writer.add_scalar("F1/test", avg_test_f1, ep)
 
-    if (avg_test_recall > recall_max):
+    if (avg_test_f1 > f1_max):
+        score_matrix = []
         print('Test loss decrease from ({:.6f} --> {:.6f}) '.format(loss_min, avg_test_loss))
-        print('recall increase from {:.6f} --> {:.6f}'.format(recall_max, avg_test_recall))
-        print('Can save model')
+        print('Test f1 increase from {:.6f} --> {:.6f}'.format(f1_max, avg_test_f1))
         # check_point.save_ckpt(checkpoint, True, model_name, checkpoint_dir, best_model_dir, ep)
-        check_point.save_config_param(best_model_dir, model_name, config_param)
-        torch.save(rec_sys_model, best_model_dir+model_name+'.pt')
-        print('Done')
+        check_point.save_config_param(output_dir, args.model_name, config_param)
         loss_min = avg_test_loss
-        recall_max = avg_test_recall
+        f1_max = avg_test_f1
+        torch.save(rec_sys_model, output_dir + '/best_' + args.model_name + '.pt')
+        print('Can save model')
 
     print('-' * 100)
     # ckpt_path = checkpoint_dir+model_name+'/epoch_'+str(ep)+'/'

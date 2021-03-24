@@ -166,7 +166,7 @@ def read_instances_lines_from_file(file_path):
         lines = [line.rstrip('\n') for line in f]
         return lines
 
-def predict_top_k(logits, top_k, batch_size, device, nb_items):
+def predict_top_k(logits, top_k, batch_size, nb_items):
     predict_prob = torch.sigmoid(logits).cpu()
     # predict_prob = logits
     row_index = [i for i in range(0, batch_size)]
@@ -189,17 +189,20 @@ def predict_top_k(logits, top_k, batch_size, device, nb_items):
     return predict_topk
 
 
-def compute_recall_at_top_k(model, logits, top_k, target_basket, batch_size, device):
+def compute_recall_at_top_k(model, logits, top_k, target_basket, batch_size):
     nb_items = model.nb_items
-    predict_basket = predict_top_k(logits, top_k, batch_size, device, nb_items)
+    predict_basket = predict_top_k(logits, top_k, batch_size, nb_items)
     target_basket_np = target_basket.cpu().numpy()
     correct_predict = predict_basket * target_basket_np
-    # nb_correct = (correct_predict == 1.0).sum(dim=-1)
     nb_correct = np.count_nonzero(correct_predict, axis=1)
-    # actual_basket_size = (target_basket == 1.0).sum(dim=-1)
     actual_basket_size = np.count_nonzero(target_basket_np, axis=1)
-
-    return np.mean(nb_correct / actual_basket_size)
+    recall = nb_correct / actual_basket_size
+    precision = nb_correct / top_k
+    f1 = np.zeros_like(nb_correct, dtype=float)
+    for i in range(len(recall)):
+        if recall[i] != 0:
+            f1[i] = (2 * precision[i] * recall[i]) / (precision[i] + recall[i])
+    return np.mean(recall), np.mean(precision), np.mean(f1)
 
 def plot_loss(train_losses, val_losses, images_dir):
     with plt.style.context('seaborn-dark'):
