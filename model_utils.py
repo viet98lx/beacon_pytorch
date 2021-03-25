@@ -35,7 +35,7 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
         running_train_loss += train_loss_item
         avg_train_loss = running_train_loss / (i + 1)
 
-        train_recall_item, train_prec_item, train_f1_item = utils.compute_recall_at_top_k(model, predict.clone().detach(), top_k, y_train.clone().detach(), real_batch_size, device)
+        train_recall_item, train_prec_item, train_f1_item = utils.compute_recall_at_top_k(model, predict.clone().detach(), top_k, y_train.clone().detach(), real_batch_size)
         running_train_recall += train_recall_item
         avg_train_recall = running_train_recall / (i + 1)
         running_train_prec += train_prec_item
@@ -93,7 +93,7 @@ def validate_model(model, loss_func, valid_loader, epoch, top_k, val_display_ste
         running_val_loss += val_loss_item
         avg_val_loss = running_val_loss / (valid_i + 1)
 
-        val_recall_item, val_prec_item, val_f1_item  = utils.compute_recall_at_top_k(model, valid_predict, top_k, y_valid, val_batch_size, device)
+        val_recall_item, val_prec_item, val_f1_item  = utils.compute_recall_at_top_k(model, valid_predict, top_k, y_valid, val_batch_size)
         running_val_recall += val_recall_item
         avg_val_recall = running_val_recall / (valid_i + 1)
         running_val_prec += val_prec_item
