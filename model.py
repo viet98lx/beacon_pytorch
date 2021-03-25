@@ -67,12 +67,40 @@ class RecSysModel(torch.nn.Module):
         return (weight.new(self.rnn_layers, batch_size, self.rnn_units).zero_(),
                 weight.new(self.rnn_layers, batch_size, self.rnn_units).zero_())
 
+    # def forward(self, x, seq_len, hidden):
+    #     batch_size = x.size()[0]
+    #     item_bias_diag = F.relu(self.I_B)
+    #     reshape_x = x.reshape(-1, self.nb_items)
+    #     x_mm_C = torch.mm(reshape_x.cpu(), self.C)
+    #     encode_x_graph = reshape_x*item_bias_diag + F.relu(x_mm_C.to(self.device) - torch.abs(self.threshold))
+    #     basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
+    #     basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
+    #
+    #     # next basket sequence encoder
+    #     lstm_out, (h_n, c_n) = self.seq_encoder(basket_encoder_1, hidden)
+    #     actual_index = torch.arange(0, batch_size) * self.max_seq_length + (seq_len - 1)
+    #     actual_lstm_out = lstm_out.reshape(-1, self.rnn_units)[actual_index]
+    #
+    #     hidden_to_score = self.h2item_score(actual_lstm_out)
+    #
+    #     # predict next items score
+    #     next_item_probs = torch.sigmoid(hidden_to_score)
+    #
+    #     # next_item_probs_mm_C = torch.mm(next_item_probs.cpu(), self.C)
+    #     # + next_item_probs_mm_C.to(self.device)
+    #
+    #     # print(next_item_probs)
+    #     predict = (1 - self.alpha) * next_item_probs + self.alpha * (
+    #             next_item_probs*item_bias_diag)
+    #     return predict
+
     def forward(self, x, seq_len, hidden):
         batch_size = x.size()[0]
+        C_matrix = self.C.to(self.device)
         item_bias_diag = F.relu(self.I_B)
         reshape_x = x.reshape(-1, self.nb_items)
-        x_mm_C = torch.mm(reshape_x.cpu(), self.C)
-        encode_x_graph = reshape_x*item_bias_diag + F.relu(x_mm_C.to(self.device) - torch.abs(self.threshold))
+        x_mm_C = torch.mm(reshape_x, C_matrix)
+        encode_x_graph = reshape_x*item_bias_diag + F.relu(x_mm_C - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
         basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
 
@@ -91,5 +119,5 @@ class RecSysModel(torch.nn.Module):
 
         # print(next_item_probs)
         predict = (1 - self.alpha) * next_item_probs + self.alpha * (
-                next_item_probs*item_bias_diag)
+                next_item_probs*item_bias_diag + torch.mm(next_item_probs, C_matrix))
         return predict
