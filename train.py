@@ -133,7 +133,7 @@ test_display_step = 10
 epoch = args.epoch
 
 loss_min = 1000
-recall_max = 0
+f1_max = 0
 epsilon = args.epsilon
 
 train_losses = []
