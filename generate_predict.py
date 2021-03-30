@@ -59,17 +59,17 @@ ckpt_dir = args.ckpt_dir
 data_dir = args.data_dir
 real_adj_matrix = sp.load_npz(data_dir + 'adj_matrix/r_matrix_'+ str(args.nb_hop) + 'w.npz')
 
-train_data_path = data_dir + 'train_lines.txt'
+train_data_path = data_dir + 'train.txt'
 train_instances = utils.read_instances_lines_from_file(train_data_path)
 nb_train = len(train_instances)
 print(nb_train)
 
-validate_data_path = data_dir + 'validate_lines.txt'
+validate_data_path = data_dir + 'validate.txt'
 validate_instances = utils.read_instances_lines_from_file(validate_data_path)
 nb_validate = len(validate_instances)
 print(nb_validate)
 
-test_data_path = data_dir + 'test_lines.txt'
+test_data_path = data_dir + 'test.txt'
 test_instances = utils.read_instances_lines_from_file(test_data_path)
 nb_test = len(test_instances)
 print(nb_test)
