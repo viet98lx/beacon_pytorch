@@ -28,6 +28,7 @@ with open(result_file, 'r') as f:
                 list_top_k_item.append(item_key)
             list_seq_topk_predicted.append(list_top_k_item.copy())
             list_top_k_item.clear()
+
 for topk in [5,10,15,20]:
     list_recall = []
     for gt, predict in zip(list_seq, list_seq_topk_predicted):
