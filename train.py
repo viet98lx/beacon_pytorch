@@ -187,7 +187,7 @@ for ep in range(epoch):
         check_point.save_config_param(output_dir, args.model_name, config_param)
         loss_min = avg_test_loss
         f1_max = avg_test_f1
-        torch.save(rec_sys_model, output_dir + '/best_' + args.model_name + '.pt')
+        torch.save(rec_sys_model, best_model_dir + '/best_' + args.model_name + '.pt')
         print('Can save model')
 
     print('-' * 100)
