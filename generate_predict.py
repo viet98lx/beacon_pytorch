@@ -50,11 +50,11 @@ parser.add_argument('--data_dir', type=str, help='folder contains data', require
 parser.add_argument('--nb_hop', type=int, help='level of correlation matrix', default=1)
 parser.add_argument('--batch_size', type=int, help='batch size predict', default=8)
 parser.add_argument('--nb_predict', type=int, help='number items predicted', default=30)
-# parser.add_argument('--log_result_dir', type=str, help='folder to save result', required=True)
+parser.add_argument('--log_result_dir', type=str, help='folder to save result', required=True)
 
 args = parser.parse_args()
 
-prefix_model_ckpt = args.model_name
+prefix_model_name = args.model_name
 ckpt_dir = args.ckpt_dir
 data_dir = args.data_dir
 real_adj_matrix = sp.load_npz(data_dir + 'adj_matrix/r_matrix_'+ str(args.nb_hop) + 'w.npz')
@@ -89,7 +89,16 @@ batch_size = args.batch_size
 # valid_loader = data_utils.generate_data_loader(validate_instances, load_param['batch_size'], item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=False)
 test_loader = data_utils.generate_data_loader(test_instances, batch_size, item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=True)
 
-load_model = torch.load(ckpt_dir+'/'+prefix_model_ckpt+'.pt')
+load_model = torch.load(ckpt_dir+'/'+prefix_model_name+'.pt')
+
+log_folder = os.path.join(args.log_result_dir, prefix_model_name)
+if(not os.path.exists(log_folder)):
+  try:
+    os.makedirs(log_folder, exist_ok = True)
+    print("Directory '%s' created successfully" % log_folder)
+  except OSError as error:
+      print("OS folder error")
+
 nb_predict = args.nb_predict
-result_file = ckpt_dir+'/'+prefix_model_ckpt+'_predict_top_' + str(nb_predict) + '.txt'
+result_file = log_folder + '/' + prefix_model_name + '_predict_top_' + str(nb_predict) + '.txt'
 generate_predict(load_model, test_loader, result_file, reversed_item_dict, nb_predict, batch_size)
