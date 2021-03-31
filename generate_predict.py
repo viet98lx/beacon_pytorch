@@ -47,6 +47,7 @@ parser.add_argument('--ckpt_dir', type=str, help='folder contains check point', 
 parser.add_argument('--model_name', type=str, help='name of model', required=True)
 # parser.add_argument('--epoch', type=int, help='last epoch before interrupt', required=True)
 parser.add_argument('--data_dir', type=str, help='folder contains data', required=True)
+parser.add_argument('--device', type=str, help='device for train and predict', default='cpu')
 parser.add_argument('--nb_hop', type=int, help='level of correlation matrix', default=1)
 parser.add_argument('--batch_size', type=int, help='batch size predict', default=8)
 parser.add_argument('--nb_predict', type=int, help='number items predicted', default=30)
@@ -58,6 +59,9 @@ prefix_model_name = args.model_name
 ckpt_dir = args.ckpt_dir
 data_dir = args.data_dir
 real_adj_matrix = sp.load_npz(data_dir + 'adj_matrix/r_matrix_'+ str(args.nb_hop) + 'w.npz')
+
+exec_device = torch.device('cuda:{}'.format(args.device[-1]) if ('gpu' in args.device and torch.cuda.is_available()) else 'cpu')
+data_type = torch.float
 
 train_data_path = data_dir + 'train.txt'
 train_instances = utils.read_instances_lines_from_file(train_data_path)
@@ -78,7 +82,7 @@ print(nb_test)
 
 print("@Build knowledge")
 MAX_SEQ_LENGTH, item_dict, reversed_item_dict, item_probs = utils.build_knowledge(train_instances, validate_instances, test_instances)
-print("first item in dict ", reversed_item_dict[0])
+# print("first item in dict ", reversed_item_dict[0])
 print("#Statistic")
 NB_ITEMS = len(item_dict)
 print(" + Maximum sequence length: ", MAX_SEQ_LENGTH)
@@ -89,7 +93,9 @@ batch_size = args.batch_size
 # valid_loader = data_utils.generate_data_loader(validate_instances, load_param['batch_size'], item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=False)
 test_loader = data_utils.generate_data_loader(test_instances, batch_size, item_dict, MAX_SEQ_LENGTH, is_bseq=True, is_shuffle=False)
 
-load_model = torch.load(ckpt_dir+'/'+prefix_model_name+'.pt')
+load_model = torch.load(ckpt_dir+'/'+prefix_model_name+'.pt',  map_location='cpu')
+load_model = load_model.to(device = exec_device, dtype = data_type)
+load_model.device = exec_device
 
 log_folder = os.path.join(args.log_result_dir, prefix_model_name)
 if(not os.path.exists(log_folder)):
