@@ -7,6 +7,7 @@ import check_point
 
 import argparse
 import torch
+from torch.optim.lr_scheduler import StepLR
 import torch.nn as nn
 from torch import optim
 import numpy as np
@@ -151,6 +152,7 @@ print('-------------------Start Training Model---------------------')
 ############################ Train Model #############################
 
 # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8)
+scheduler = StepLR(optimizer, step_size=3, gamma=0.5)
 
 for ep in range(epoch):
 
@@ -181,6 +183,7 @@ for ep in range(epoch):
     writer.add_scalar("Precision/test", avg_test_prec, ep)
     writer.add_scalar("F1/test", avg_test_f1, ep)
 
+    scheduler.step()
     if (avg_test_f1 > f1_max):
         score_matrix = []
         print('Test loss decrease from ({:.6f} --> {:.6f}) '.format(loss_min, avg_test_loss))
