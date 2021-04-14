@@ -49,7 +49,7 @@ class RecSysModel(torch.nn.Module):
         self.fc_basket_encoder_1 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
         self.seq_encoder = nn.LSTM(self.embedding_dim, self.rnn_units, self.rnn_layers, bias=True, batch_first=True)
         # self.W_hidden = nn.Parameter(data=torch.randn(self.rnn_units, self.nb_items).type(self.d_type))
-        self.h2item_score = nn.Parameter(data = torch.rand(self.rnn_units, self.nb_items))
+        self.h2item_score = nn.Parameter(data = torch.zeros(self.rnn_units, self.nb_items))
         self.threshold = nn.Parameter(data=torch.Tensor([threshold]).type(d_type))
         self.I_B = nn.Parameter(data=item_bias.type(d_type))
         self.init_weight()
