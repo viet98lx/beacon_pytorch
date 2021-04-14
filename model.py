@@ -49,16 +49,22 @@ class RecSysModel(torch.nn.Module):
         self.fc_basket_encoder_1 = nn.Linear(in_features=self.nb_items, out_features=self.embedding_dim, bias=True)
         self.seq_encoder = nn.LSTM(self.embedding_dim, self.rnn_units, self.rnn_layers, bias=True, batch_first=True)
         # self.W_hidden = nn.Parameter(data=torch.randn(self.rnn_units, self.nb_items).type(self.d_type))
-        self.h2item_score = nn.Linear(in_features=self.rnn_units, out_features=self.nb_items, bias=False)
+        self.h2item_score = nn.Parameter(data = torch.rand(self.rnn_units, self.nb_items))
         self.threshold = nn.Parameter(data=torch.Tensor([threshold]).type(d_type))
         self.I_B = nn.Parameter(data=item_bias.type(d_type))
         self.init_weight()
 
     def init_weight(self):
-        torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_1.weight.data, nonlinearity='relu')
-        self.fc_basket_encoder_1.bias.data.zero_()
+        torch.nn.init.kaiming_uniform_(self.fc_basket_encoder_1.weight.data, mode='fan_in', nonlinearity='relu')
+        torch.nn.init.zeros_(self.fc_basket_encoder_1.bias.data)
 
-        torch.nn.init.xavier_uniform_(self.h2item_score.weight.data)
+        for name, param in self.seq_encoder.named_parameters():
+            if 'bias' in name:
+                nn.init.constant_(param, 0.0)
+            elif 'weight' in name:
+                nn.init.xavier_uniform_(param)
+
+        torch.nn.init.xavier_uniform_(self.h2item_score.data)
 
     def init_hidden(self, batch_size):
         # Before we've done anything, we dont have any hidden state.
@@ -102,22 +108,20 @@ class RecSysModel(torch.nn.Module):
         x_mm_C = torch.mm(reshape_x, C_matrix)
         encode_x_graph = reshape_x*item_bias_diag + F.relu(x_mm_C - torch.abs(self.threshold))
         basket_x = encode_x_graph.reshape(-1, self.max_seq_length, self.nb_items)
-        basket_encoder_1 = self.drop_out_1(F.relu(self.fc_basket_encoder_1(basket_x)))
+        basket_encoder_1 = F.relu(self.fc_basket_encoder_1(basket_x))
+        basket_encoder_1 = self.drop_out_1(basket_encoder_1)
 
         # next basket sequence encoder
         lstm_out, (h_n, c_n) = self.seq_encoder(basket_encoder_1, hidden)
         actual_index = torch.arange(0, batch_size) * self.max_seq_length + (seq_len - 1)
         actual_lstm_out = lstm_out.reshape(-1, self.rnn_units)[actual_index]
 
-        hidden_to_score = self.h2item_score(actual_lstm_out)
+        hidden_to_score = torch.matmul(actual_lstm_out,self.h2item_score)
 
         # predict next items score
         next_item_probs = torch.sigmoid(hidden_to_score)
 
-        # next_item_probs_mm_C = torch.mm(next_item_probs.cpu(), self.C)
-        # + next_item_probs_mm_C.to(self.device)
-
         # print(next_item_probs)
         predict = (1 - self.alpha) * next_item_probs + self.alpha * (
-                next_item_probs*item_bias_diag + torch.mm(next_item_probs, C_matrix))
+                next_item_probs*item_bias_diag + F.relu(torch.mm(next_item_probs, C_matrix)))
         return predict

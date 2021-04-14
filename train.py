@@ -14,6 +14,7 @@ import scipy.sparse as sp
 import random
 import os
 from torch.utils.tensorboard import SummaryWriter
+torch.backends.cudnn.enabled = False
 
 torch.set_printoptions(precision=8)
 parser = argparse.ArgumentParser(description='Train model')
@@ -108,7 +109,7 @@ for param in rec_sys_model.parameters():
   print(param.shape)
 
 loss_func = loss.Weighted_BCE_Loss()
-optimizer = torch.optim.RMSprop(rec_sys_model.parameters(), lr= args.lr, weight_decay= 1e-6)
+optimizer = torch.optim.RMSprop(rec_sys_model.parameters(), lr= args.lr, alpha=0.9, eps=1e-10)
 
 try:
     os.makedirs(output_dir, exist_ok = True)
