@@ -128,8 +128,8 @@ model_name = args.model_name
 
 
 top_k = config_param['top_k']
-train_display_step = 300
-val_display_step = 60
+train_display_step = 50
+val_display_step = 10
 test_display_step = 10
 epoch = args.epoch
 
@@ -145,8 +145,6 @@ test_losses = []
 test_recalls = []
 
 log_dir = 'seed_{}_{}'.format(seed, args.model_name)
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
 writer = SummaryWriter(log_dir='runs/'+log_dir)
 print('-------------------Start Training Model---------------------')
 
