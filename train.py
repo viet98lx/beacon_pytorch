@@ -161,6 +161,9 @@ for ep in range(epoch):
     writer.add_scalar("Recall/train", avg_train_recall, ep)
     writer.add_scalar("Precision/train", avg_train_prec, ep)
     writer.add_scalar("F1/train", avg_train_f1, ep)
+    for name, weight in rec_sys_model.named_parameters():
+        writer.add_histogram(name, weight, ep)
+        writer.add_histogram(f'{name}.grad', weight.grad, ep)
 
     avg_val_loss, avg_val_recall, avg_val_prec, avg_val_f1 = model_utils.validate_model(rec_sys_model, loss_func, valid_loader,
                                                               ep, top_k, val_display_step)

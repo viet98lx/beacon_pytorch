@@ -45,7 +45,7 @@ def train_model(model, loss_func, optimizer, train_loader, epoch, top_k, train_d
 
         end = time.time()
 
-        if ((i + 1) % train_display_step == 0 or (i + 1) == total_train_batch):  # print every 50 mini-batches
+        if ((i + 1) == total_train_batch):  # print every 50 mini-batches
             top_pred = predict.clone().detach().topk(dim=-1, k=model.top_k, sorted=True)
             print(
                 '[Epoch : % d ,Batch Index : %d / %d] Train Loss : %.8f ----- Train Recall@%d: %.8f / Train Precision: %.8f / Train F1: %.8f ----- Time : %.3f seconds ' %
