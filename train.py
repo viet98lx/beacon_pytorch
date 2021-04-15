@@ -110,7 +110,8 @@ for param in rec_sys_model.parameters():
   print(param.shape)
 
 loss_func = loss.Weighted_BCE_Loss()
-optimizer = torch.optim.RMSprop(rec_sys_model.parameters(), lr= args.lr, alpha=0.9, eps=1e-10)
+# optimizer = torch.optim.RMSprop(rec_sys_model.parameters(), lr= args.lr, alpha=0.9, eps=1e-10)
+optimizer = torch.optim.Adam(rec_sys_model.parameters(), lr= args.lr)
 
 try:
     os.makedirs(output_dir, exist_ok = True)
@@ -152,7 +153,7 @@ print('-------------------Start Training Model---------------------')
 ############################ Train Model #############################
 
 # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8)
-scheduler = StepLR(optimizer, step_size=3, gamma=0.5)
+scheduler = StepLR(optimizer, step_size=4, gamma=0.5)
 
 for ep in range(epoch):
 
